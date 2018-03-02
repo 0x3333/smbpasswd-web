@@ -1,0 +1,13 @@
+.footer {
+    color: #777;
+    border-top: .05rem solid #e5e5e5;
+}
+
+.card {
+    width: 40rem;
+    margin: 0 auto;
+}
+
+input[type=button] {
+    cursor: pointer;
+}

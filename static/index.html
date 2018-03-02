@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>smbpasswd-web</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.12.12/sweetalert2.min.css" />
+    <link rel="stylesheet" type="text/css" href="app.css">
+</head>
+
+<body>
+    <div class="container mt-3">
+
+        <nav class="navbar navbar-light bg-light mb-3">
+            <a class="navbar-brand" href="#">
+                <img src="logo.png" class="d-inline-block align-middle" alt="">
+            </a>
+        </nav>
+
+        <main>
+
+            <div class="card">
+                <div class="card-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <div class="input-group input-group-lg">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                        <i class="fa fa-user-o" aria-hidden="true"></i>
+                                    </span>
+                                </div>
+                                <input type="text" class="form-control" id="username" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <div class="input-group input-group-lg">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                        <i id="thermometer" class="fa fa-thermometer-0" aria-hidden="true"></i>
+                                    </span>
+                                </div>
+                                <input type="password" class="form-control" id="password" aria-label="Password">
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="thermometer-msg"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="password-check">Repeat Password</label>
+                            <div class="input-group input-group-lg">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                        <i id="password-check-icon" class="fa fa-lock" aria-hidden="true"></i>
+                                    </span>
+                                </div>
+                                <input type="password" class="form-control" id="password-check" aria-label="Password-check">
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="password-check-msg"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <input id="btn-submit" type="button" class="mt-5 btn btn-primary btn-block btn-lg" disabled value="Submit">
+                    </form>
+                </div>
+            </div>
+
+        </main>
+
+        <footer class="my-5 pt-5 text-muted text-center text-small">
+            <p class="mb-1">Code licensed under <a href="https://github.com/0x3333/smbpasswd-web/blob/master/LICENSE">MIT</a></p>
+            <ul class="list-inline">
+                <li class="list-inline-item">
+                    App icon by <a href="https://icons8.com/">icons8.</a>
+                </li>
+            </ul>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.13.0/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.12.12/sweetalert2.min.js"></script>
+    <script src="app.js"></script>
+</body>
+
+
+</html>
