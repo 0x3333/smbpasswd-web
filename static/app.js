@@ -1,6 +1,7 @@
 function getUrlQuery() {
     return window.location.href.indexOf('?') > -1 ? window.location.href.slice(window.location.href.indexOf('?') + 1) : "";
 }
+// From: https://stackoverflow.com/a/11268104/121481
 function scorePassword(pass) {
     var score = 0;
     if (!pass)
