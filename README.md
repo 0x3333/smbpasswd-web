@@ -6,6 +6,10 @@
 
 The only purpose is to allow a user to change its samba password using a webbrowser, no user adding, no machine account, nothing, plain simple changing a password.
 
+## Sneak peek
+
+![smbpasswd-web screenshog](https://github.com/0x3333/smbpasswd-web/blob/master/.github/smbpasswd-main.png)
+
 ## How it works?
 
 When a user needs to change his password, sysadmin will create a token, the token will generate a URL that the user will access to change its password. Done.
