@@ -16,6 +16,7 @@ import subprocess
 import sys
 import traceback
 from http import HTTPStatus
+from pathlib import Path
 
 __author__ = "Tercio Gaudencio FIlho"
 __copyright__ = "Copyright 2019, Tercio Gaudencio Filho"
@@ -203,6 +204,12 @@ def main():
 
     # Parse arguments
     _args = parser.parse_args()
+
+    if not os.path.exists("res"):
+        os.mkdir("res")
+
+    if not os.path.exists("res/tokens"):
+        Path("res/tokens").touch()
 
     if _args.command == "server":
         if _args.port is None:
