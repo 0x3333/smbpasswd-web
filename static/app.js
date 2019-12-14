@@ -1,7 +1,6 @@
 function getUrlQuery() {
     return window.location.href.indexOf('?') > -1 ? window.location.href.slice(window.location.href.indexOf('?') + 1) : "";
 }
-// From: https://stackoverflow.com/a/11268104/121481
 function scorePassword(pass) {
     var score = 0;
     if (!pass)
@@ -54,7 +53,7 @@ function populateUsername(token) {
             swal({
                 type: 'error',
                 title: 'Oops...',
-                text: 'Token de autenticação inválido! Contate o administrador.'
+                html: 'Invalid authentication token! <br />Contact your System Administrator.'
             })
         });
 }
@@ -72,18 +71,21 @@ function populateUsername(token) {
     $("#btn-submit").click(function() {
         $.ajax("api/set_password/" + query + "/" + $("#password-check").val())
         .done(function(data) {
+            $("#username,#password,#password-check").val("").prop("disabled", true);
+            $("#btn-submit").prop("disabled", true);
             swal({
                 type: 'success',
                 title: 'Done',
                 text: "User's password changed!"
             })
+
         })
         .fail(function(data) {
             $("input,button").prop("disabled", true);
             swal({
                 type: 'error',
                 title: 'Oops...',
-                text: "Couldn't change user's password. Contact the system administrator."
+                html: "Couldn't change user's password. <br />Contact your System Administrator."
             })
         });
     });
@@ -117,7 +119,7 @@ function populateUsername(token) {
         swal({
             type: 'error',
             title: 'Oops...',
-            text: 'Invalid user. Contact the system administrator.'
+            html: 'Invalid user. <br />Contact your System Administrator.'
         })
     }
     $("#password").focus();
