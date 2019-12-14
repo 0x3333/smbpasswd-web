@@ -8,7 +8,8 @@ The only purpose is to allow a user to change its samba password using a webbrow
 
 ## Sneak peek
 
-![smbpasswd-web screenshog](https://github.com/0x3333/smbpasswd-web/blob/master/.github/smbpasswd-main.png)
+![smbpasswd-web screenshot](https://github.com/0x3333/smbpasswd-web/blob/master/.github/smbpasswd-main.png)
+![smbpasswd-web screenshot ok](https://github.com/0x3333/smbpasswd-web/blob/master/.github/smbpasswd-ok.png)
 
 ## How it works?
 
