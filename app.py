@@ -222,10 +222,6 @@ def main():
 
     # Parse arguments
     _args = parser.parse_args()
-
-    # If we should print HTTP requests
-    _verbose = _args.verbose
-
     if not os.path.exists("res"):
         os.mkdir("res")
 
@@ -233,6 +229,9 @@ def main():
         Path("res/tokens").touch()
 
     if _args.command == "server":
+        # If we should print HTTP requests
+        _verbose = _args.verbose
+
         if _args.port is None:
             _args.port = _DEFAULT_HTTPS_PORT if _args.ssl else _DEFAULT_HTTP_PORT
 
