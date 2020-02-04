@@ -52,6 +52,7 @@ optional arguments:
                         Address to bind (default: localhost)
   -p PORT, --port PORT  Port number to bind. (default: If SSL, 8443, otherwise
                         8080)
+  -v, --verbose         Log HTTP requests
   --sudo                Use sudo to call smbpasswd
   --ssl                 Start webserver using SSL
   --ssl-cert SSL_CERT   SSL certificate to use (default: res/fullchain.pem)
