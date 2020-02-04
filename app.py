@@ -149,6 +149,8 @@ class SmbpasswdRequestHandler(http.server.SimpleHTTPRequestHandler):
             if self._call_smbpasswd(username, entries[1]) == True:
                 self.remove_token(entries[0])
                 self.send_response(200)
+                self.send_header("Content-type", "application/json")
+                self.end_headers()
                 self.wfile.write(json.dumps("OK").encode())
                 return
             else:
