@@ -44,53 +44,79 @@ function checkPassStrength(pass) {
 }
 
 function populateUsername(token) {
-    $.ajax("api/get_username/" + token)
-        .done(function(data) {
-            $("#username").val(data);
-        })
-        .fail(function(data) {
-            $("input,button").prop("disabled", true);
-            swal({
-                type: 'error',
-                title: 'Oops...',
-                html: 'Invalid authentication token! <br />Contact your System Administrator.'
-            })
+    function fail() {
+        $("input,button").prop("disabled", true);
+        swal({
+            type: 'error',
+            title: 'Oops...',
+            html: 'Invalid authentication token! <br />Contact your System Administrator.'
         });
+    }
+
+    $.ajax({
+        url: "api/get_username",
+        type: "POST",
+        data: JSON.stringify({ "token": token }),
+        contentType: "application/json; charset=UTF-8",
+        processData: false,
+        dataType: "json"
+    }).done(function (data) {
+        if (data && typeof data === "object" && data.hasOwnProperty("username")) {
+            $("#username").val(data["username"]);
+        } else {
+            fail();
+        }
+    }).fail(function (data) {
+        fail();
+    });
 }
 
-(function() {
+(function () {
     var query = getUrlQuery();
 
-    var check = function() {
+    var check = function () {
         var equal = $("#password-check").val() == $("#password").val();
         $("#password-check-icon").attr('class', equal ? "fa fa-lock text-success" : "fa fa-unlock-alt text-danger");
         $("#password-check-msg").text(equal ? "OK" : "Mismatch").attr("class", "input-group-text text-" + (equal ? "success" : "danger"));
         $("#btn-submit").prop("disabled", !equal);
     };
 
-    $("#btn-submit").click(function() {
-        $.ajax("api/set_password/" + query + "/" + $("#password-check").val())
-        .done(function(data) {
-            $("#username,#password,#password-check").val("").prop("disabled", true);
-            $("#btn-submit").prop("disabled", true);
-            swal({
-                type: 'success',
-                title: 'Done',
-                text: "User's password changed!"
-            })
-
+    function fail() {
+        $("input,button").prop("disabled", true);
+        swal({
+            type: 'error',
+            title: 'Oops...',
+            html: "Couldn't change user's password. <br />Contact your System Administrator."
         })
-        .fail(function(data) {
-            $("input,button").prop("disabled", true);
-            swal({
-                type: 'error',
-                title: 'Oops...',
-                html: "Couldn't change user's password. <br />Contact your System Administrator."
-            })
+    }
+
+    $("#btn-submit").click(function () {
+        $.ajax({
+            url: "api/set_password",
+            type: "POST",
+            data: JSON.stringify({ "token": query, "password": $("#password-check").val() }),
+            contentType: "application/json; charset=UTF-8",
+            processData: false,
+            dataType: "json"
+        }).done(function (data) {
+            if (data && typeof data === "object" &&
+                data.hasOwnProperty("status") && data["status"] == "OK") {
+                $("#username,#password,#password-check").val("").prop("disabled", true);
+                $("#btn-submit").prop("disabled", true);
+                swal({
+                    type: 'success',
+                    title: 'Done',
+                    text: "User's password changed!"
+                });
+            } else {
+                fail();
+            }
+        }).fail(function (data) {
+            fail();
         });
     });
 
-    $("#password").on("keypress keyup keydown change", function() {
+    $("#password").on("keypress keyup keydown change", function () {
         var pass = $(this).val();
         var score = scorePassword(pass);
         var color, index, msg;

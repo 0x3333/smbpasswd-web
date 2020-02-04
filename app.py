@@ -36,6 +36,7 @@ _DEFAULT_SSL_CERT = "res/fullchain.pem"
 _DEFAULT_SSL_KEY = "res/privkey.pem"
 
 _use_sudo = False
+_verbose = False
 
 def _start_web_server(ssl_cert, ssl_key, address, port):
     # Change working dir to app root folder
@@ -79,6 +80,10 @@ class SmbpasswdRequestHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header("Content-type", "application/json")
         self.end_headers()
 
+    def log_message(self, format, *args):
+        if _verbose:
+            http.server.SimpleHTTPRequestHandler.log_message(self, format, *args)
+
     def _call_smbpasswd(self, username, password):
         args = ["sudo", "smbpasswd", "-s", username]
         if not _use_sudo:
@@ -120,62 +125,68 @@ class SmbpasswdRequestHandler(http.server.SimpleHTTPRequestHandler):
                 if token[1] != provided_token:
                     file.write(f"{line}\n")
 
-    def api_get_username(self, entries):
+    def api_get_username(self, json_body):
         """Return the username for a given token"""
 
-        if len(entries) != 1:
+        if "token" not in json_body:
             self.invalid_api_request()
             return
 
-        username = self.get_username(entries[0])
-
-        if username is not None:
-            self.set_json_headers()
-            self.wfile.write(json.dumps(username).encode())
+        username = self.get_username(json_body["token"])
+        if username is None:
+            self.invalid_api_request()
             return
 
-        self.invalid_api_request()
+        self.set_json_headers()
+        self.wfile.write(json.dumps({"username":username}).encode())
 
-    def api_set_password(self, entries):
+    def api_set_password(self, json_body):
         """Define the user's smb password"""
 
-        if len(entries) != 2:
+        if "token" not in json_body and "password" not in json_body:
             self.invalid_api_request()
             return
 
-        username = self.get_username(entries[0])
+        token = json_body["token"]
+        password = json_body["password"]
+        username = self.get_username(token)
 
-        if username is not None:
-            if self._call_smbpasswd(username, entries[1]) == True:
-                self.remove_token(entries[0])
-                self.send_response(200)
-                self.send_header("Content-type", "application/json")
-                self.end_headers()
-                self.wfile.write(json.dumps("OK").encode())
-                return
-            else:
-                self.send_error(HTTPStatus.INTERNAL_SERVER_ERROR, "Could not set password.")
-                return
+        if username is None:
+            self.invalid_api_request()
+            return
 
-        self.invalid_api_request()
-
-    def api_process_request(self):
-        entries = self.path[1:].split("/")[1:]
-        if len(entries) > 0:
-            if entries[0] == "get_username":
-                self.api_get_username(entries[1:])
-            elif entries[0] == "set_password":
-                self.api_set_password(entries[1:])
+        if self._call_smbpasswd(username, password) == True:
+            self.remove_token(token)
+            self.send_response(200)
+            self.send_header("Content-type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps({"status":"OK"}).encode())
         else:
-            self.send_error(HTTPStatus.BAD_REQUEST, "Invalid API request")
+            self.send_error(HTTPStatus.INTERNAL_SERVER_ERROR, "Could not set password.")
 
     def do_GET(self):
-        """Process API and static files requests"""
+        """Process Static files requests"""
+
+        super(SmbpasswdRequestHandler, self).do_GET()
+
+    def do_POST(self):
+        """Process API"""
 
         if self.path.startswith("/api/"):
-            self.api_process_request()
+            content_length = int(self.headers['Content-Length'])
+            body = self.rfile.read(content_length)
+            json_body = json.loads(body.decode('utf-8'))
+
+            entries = self.path[1:].split("/")[1:]
+            if len(entries) > 0:
+                if entries[0] == "get_username":
+                    self.api_get_username(json_body)
+                elif entries[0] == "set_password":
+                    self.api_set_password(json_body)
+            else:
+                self.send_error(HTTPStatus.BAD_REQUEST, "Invalid API request")
         else:
-            super(SmbpasswdRequestHandler, self).do_GET()
+            super(SmbpasswdRequestHandler, self).do_POST()
 
     def list_directory(self):
         """Disable directory listing"""
@@ -184,6 +195,9 @@ class SmbpasswdRequestHandler(http.server.SimpleHTTPRequestHandler):
 
 
 def main():
+    global _use_sudo
+    global _verbose
+
     parser = argparse.ArgumentParser(
         description="smbpasswd web interface", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
@@ -193,6 +207,8 @@ def main():
     parser_server = subparsers.add_parser("server", help="Start then webserver")
     parser_server.add_argument("-a", "--address",help="Address to bind (default: %(default)s)", default=_DEFAULT_ADDRESS)
     parser_server.add_argument("-p", "--port", help=f"Port number to bind.  (default: If SSL, {_DEFAULT_HTTPS_PORT}, otherwise {_DEFAULT_HTTP_PORT})")
+
+    parser_server.add_argument("-v", "--verbose", help="Log HTTP requests", action="store_true")
 
     parser_server.add_argument("--sudo", help="Use sudo to call smbpasswd", action="store_true")
 
@@ -206,6 +222,9 @@ def main():
 
     # Parse arguments
     _args = parser.parse_args()
+
+    # If we should print HTTP requests
+    _verbose = _args.verbose
 
     if not os.path.exists("res"):
         os.mkdir("res")
