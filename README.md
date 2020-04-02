@@ -37,6 +37,7 @@ optional arguments:
 ```
 
 Note: `smbpasswd` must be in `$PATH`, same for `sudo` if in use.
+
 Note 2: Currently, the generated URL is sort of invalid, you must adapt the output to send to your user. Soon will fix this using a configuration file.
 
 ### Server Mode
