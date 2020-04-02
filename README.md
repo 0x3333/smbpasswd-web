@@ -4,7 +4,7 @@
 
 ***smbpasswd-web*** is a simple web interface to smbpasswd.
 
-The only purpose is to allow a user to change its samba password using a webbrowser, no user adding, no machine account, nothing, plain simple changing a password.
+The only purpose is to allow a user to change its samba password using a webbrowser, no user adding, no machine account, nothing, plain simple changing a password. By default, we use `smbpasswd`, but has been added support to use `samba-tool` instead `smbpasswd`, initial PR by @svenseeberg.
 
 ## Sneak peek
 
@@ -25,7 +25,7 @@ You _SHOULD_ use this app over a SSL connection, otherwise, your user's password
 $ ./app.py --help
 usage: app.py [-h] {server,gen-token} ...
 
-smbpasswd web interface
+Web interface to change samba user's password
 
 positional arguments:
   {server,gen-token}  Commands available
@@ -53,7 +53,8 @@ optional arguments:
   -p PORT, --port PORT  Port number to bind. (default: If SSL, 8443, otherwise
                         8080)
   -v, --verbose         Log HTTP requests
-  --sudo                Use sudo to call smbpasswd
+  --sudo                Use sudo to call smbpasswd/samba-tool
+  --samba-tool          Use samba-tool instead smbpasswd
   --ssl                 Start webserver using SSL
   --ssl-cert SSL_CERT   SSL certificate to use (default: res/fullchain.pem)
   --ssl-key SSL_KEY     SSL certificate private key (default: res/privkey.pem)
