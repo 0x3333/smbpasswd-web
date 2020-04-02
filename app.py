@@ -85,12 +85,12 @@ class SmbpasswdRequestHandler(http.server.SimpleHTTPRequestHandler):
             http.server.SimpleHTTPRequestHandler.log_message(self, format, *args)
 
     def _call_smbpasswd(self, username, password):
-        args = ["sudo", "smbpasswd", "-s", username]
+        args = ["sudo", "samba-tool", "user", "setpassword","--newpassword="+password, username]
         if not _use_sudo:
             args = args[1:]
         try:
             proc = subprocess.Popen(args, stdout=subprocess.DEVNULL, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
-            _, std_err = proc.communicate(input=(password + "\n" + password + "\n").encode())
+            _, std_err = proc.communicate()
             if proc.returncode == 0:
                 return True
             else:
