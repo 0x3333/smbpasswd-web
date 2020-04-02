@@ -36,6 +36,7 @@ _DEFAULT_SSL_CERT = "res/fullchain.pem"
 _DEFAULT_SSL_KEY = "res/privkey.pem"
 
 _use_sudo = False
+_use_samba_tool = False
 _verbose = False
 
 def _start_web_server(ssl_cert, ssl_key, address, port):
@@ -84,13 +85,20 @@ class SmbpasswdRequestHandler(http.server.SimpleHTTPRequestHandler):
         if _verbose:
             http.server.SimpleHTTPRequestHandler.log_message(self, format, *args)
 
-    def _call_smbpasswd(self, username, password):
-        args = ["sudo", "smbpasswd", "-s", username]
+    def _call_tool(self, username, password):
+        args = ["sudo"]
+        input_param = None
+        if _use_samba_tool:
+            args += ["samba-tool", "user", "setpassword", username, "--newpassword", password]
+        else:
+            args += ["smbpasswd", "-s", username]
+            params = (password + "\n" + password + "\n").encode()
+
         if not _use_sudo:
             args = args[1:]
         try:
             proc = subprocess.Popen(args, stdout=subprocess.DEVNULL, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
-            _, std_err = proc.communicate(input=(password + "\n" + password + "\n").encode())
+            _, std_err = proc.communicate(input=input_param)
             if proc.returncode == 0:
                 return True
             else:
@@ -155,7 +163,7 @@ class SmbpasswdRequestHandler(http.server.SimpleHTTPRequestHandler):
             self.invalid_api_request()
             return
 
-        if self._call_smbpasswd(username, password) == True:
+        if self._call_tool(username, password) == True:
             self.remove_token(token)
             self.send_response(200)
             self.send_header("Content-type", "application/json")
@@ -196,10 +204,11 @@ class SmbpasswdRequestHandler(http.server.SimpleHTTPRequestHandler):
 
 def main():
     global _use_sudo
+    global _use_samba_tool
     global _verbose
 
     parser = argparse.ArgumentParser(
-        description="smbpasswd web interface", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        description="Web interface to change samba user's password", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     subparsers = parser.add_subparsers(dest="command", help="Commands available")
 
@@ -210,7 +219,9 @@ def main():
 
     parser_server.add_argument("-v", "--verbose", help="Log HTTP requests", action="store_true")
 
-    parser_server.add_argument("--sudo", help="Use sudo to call smbpasswd", action="store_true")
+    parser_server.add_argument("--sudo", help="Use sudo to call smbpasswd/samba-tool", action="store_true")
+
+    parser_server.add_argument("--samba-tool", help="Use samba-tool instead smbpasswd", action="store_true")
 
     parser_server.add_argument("--ssl", help="Start webserver using SSL", action="store_true")
     parser_server.add_argument("--ssl-cert",help="SSL certificate to use (default: %(default)s)", default=_DEFAULT_SSL_CERT)
@@ -236,6 +247,7 @@ def main():
             _args.port = _DEFAULT_HTTPS_PORT if _args.ssl else _DEFAULT_HTTP_PORT
 
         _use_sudo = _args.sudo
+        _use_samba_tool = _args.samba_tool
         _start_web_server(_args.ssl_cert, _args.ssl_key, _args.address, int(_args.port))
     elif _args.command == "gen-token":
         _generate_token(_args.username)
