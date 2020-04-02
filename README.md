@@ -99,6 +99,13 @@ Send this URL to your user(See note 2 in `Usage`).
 
 By default ***smbpasswd-web***  will bind to localhost:8443 when in SSL mode or localhost:8080 otherwise. Using a `nginx`(or alike) as a proxy is good advice. Also you can expose it in port 80 or 443 so the URL gets cleaner.
 
+### TODO
+
+PR are welcome! :)
+
+- [ ] Add support for custom hostname in the generated URL
+- [ ] Add a systemd unit file to be used as a service
+
 ## License
 
  *smbpasswd-web* is released under the MIT license. See LICENSE.
