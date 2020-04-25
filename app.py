@@ -49,7 +49,7 @@ def _start_web_server(ssl_cert, ssl_key, address, port):
     os.chdir("static")
     httpd.serve_forever()
 
-def _generate_token(username):
+def _generate_token(username, ssl, fqdn):
     # TODO: Validate the username provided
 
     token = None
@@ -66,10 +66,9 @@ def _generate_token(username):
         with open("res/tokens", "a") as file:
             file.write(f"{username}\t{token}\n")
 
-    # TODO: Must have a configuration file, so the generated URL is correct
+    protocol = "https" if ssl else "http"
     print("Token generated:\n")
-    print(f"http://{socket.getfqdn()}/?{token}")
-
+    print(f"{protocol}://{fqdn}/?{token}")
 
 class SmbpasswdRequestHandler(http.server.SimpleHTTPRequestHandler):
 
@@ -228,7 +227,9 @@ def main():
     parser_server.add_argument("--ssl-key",help="SSL certificate private key (default: %(default)s)", default=_DEFAULT_SSL_KEY)
 
     # Token command
-    parser_token = subparsers.add_parser("gen-token", help="enerate a token to a username")
+    parser_token = subparsers.add_parser("gen-token", help="Generate a token to a username")
+    parser_token.add_argument("--ssl", help="Use https protocol on the generated URL", action="store_true")
+    parser_token.add_argument("--fqdn", help="Use this FQDN instead the default one", default=socket.getfqdn())
     parser_token.add_argument("username", metavar="USERNAME", help="Username")
 
     # Parse arguments
@@ -250,7 +251,7 @@ def main():
         _use_samba_tool = _args.samba_tool
         _start_web_server(_args.ssl_cert, _args.ssl_key, _args.address, int(_args.port))
     elif _args.command == "gen-token":
-        _generate_token(_args.username)
+        _generate_token(_args.username, _args.ssl, _args.fqdn)
     else:
         print("Invalid arguments.")
 
