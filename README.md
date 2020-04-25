@@ -17,7 +17,7 @@ When a user needs to change his password, sysadmin will create a token, the toke
 
 ## Securing
 
-You _SHOULD_ use this app over a SSL connection, otherwise, your user's password can be sniffed. You can run the embedded webserver using SSL, you just need to provide the certificate file(`--ssl-cert CERT_FILE`) and private key(`--ssl-key KEY_FILE`) with the flag `--ssl`.
+You _MUST_ use this app over a SSL connection, otherwise, your user's password can be sniffed. You can run the embedded webserver using SSL, you just need to provide the certificate file(`--ssl-cert CERT_FILE`) and private key(`--ssl-key KEY_FILE`) with the flag `--ssl`.
 
 ## Usage
 
@@ -30,7 +30,7 @@ Web interface to change samba user's password
 positional arguments:
   {server,gen-token}  Commands available
     server            Start then webserver
-    gen-token         enerate a token to a username
+    gen-token         Generate a token to a username
 
 optional arguments:
   -h, --help          show this help message and exit
@@ -38,21 +38,20 @@ optional arguments:
 
 Note: `smbpasswd` must be in `$PATH`, same for `sudo` if in use.
 
-Note 2: Currently, the generated URL is sort of invalid, you must adapt the output to send to your user. Soon will fix this using a configuration file.
+Note 2: ~~Currently, the generated URL is sort of invalid, you must adapt the output to send to your user. Soon will fix this using a configuration file.~~. Fixed, you can provide `--fqdn` to `gen-token` command.
 
 ### Server Mode
 
 ```
 $ ./app.py server --help
-usage: app.py server [-h] [-a ADDRESS] [-p PORT] [--sudo] [--ssl]
-                     [--ssl-cert SSL_CERT] [--ssl-key SSL_KEY]
+usage: app.py server [-h] [-a ADDRESS] [-p PORT] [-v] [--sudo] [--samba-tool]
+                     [--ssl] [--ssl-cert SSL_CERT] [--ssl-key SSL_KEY]
 
 optional arguments:
   -h, --help            show this help message and exit
   -a ADDRESS, --address ADDRESS
                         Address to bind (default: localhost)
-  -p PORT, --port PORT  Port number to bind. (default: If SSL, 8443, otherwise
-                        8080)
+  -p PORT, --port PORT  Port number to bind. (default: If SSL, 8443, otherwise 8080)
   -v, --verbose         Log HTTP requests
   --sudo                Use sudo to call smbpasswd/samba-tool
   --samba-tool          Use samba-tool instead smbpasswd
@@ -65,13 +64,15 @@ optional arguments:
 
 ```
 $ ./app.py gen-token --help
-usage: app.py gen-token [-h] USERNAME
+usage: app.py gen-token [-h] [--ssl] [--fqdn FQDN] USERNAME
 
 positional arguments:
-  USERNAME    Username
+  USERNAME     Username
 
 optional arguments:
-  -h, --help  show this help message and exit
+  -h, --help   show this help message and exit
+  --ssl        Use https protocol on the generated URL
+  --fqdn FQDN  Use this FQDN instead the default one
 ```
 
 ### Examples
@@ -103,7 +104,7 @@ By default ***smbpasswd-web***  will bind to localhost:8443 when in SSL mode or 
 
 PR are welcome! :)
 
-- [ ] Add support for custom hostname in the generated URL
+- [X] Add support for custom hostname in the generated URL. Fixed on #c925c12385.
 - [ ] Add a systemd unit file to be used as a service
 
 ## License
