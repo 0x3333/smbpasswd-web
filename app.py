@@ -68,7 +68,7 @@ def _generate_token(username):
 
     # TODO: Must have a configuration file, so the generated URL is correct
     print("Token generated:\n")
-    print(f"http://{socket.gethostname()}/?{token}")
+    print(f"http://{socket.getfqdn()}/?{token}")
 
 
 class SmbpasswdRequestHandler(http.server.SimpleHTTPRequestHandler):
