@@ -35,21 +35,28 @@ _DEFAULT_ADDRESS = "localhost"
 _DEFAULT_SSL_CERT = "res/fullchain.pem"
 _DEFAULT_SSL_KEY = "res/privkey.pem"
 
+_APP_PATH = os.path.dirname(os.path.abspath(__file__))
+
 _use_sudo = False
 _use_samba_tool = False
 _verbose = False
 
-def _start_web_server(ssl_cert, ssl_key, address, port):
+def _start_web_server(is_ssl, ssl_cert, ssl_key, address, port):
     # Change working dir to app root folder
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
     httpd = http.server.HTTPServer((address, port), SmbpasswdRequestHandler)
-    if ssl_cert and ssl_key and os.path.isfile(ssl_cert) and os.path.isfile(ssl_key):
+    if is_ssl:
+        if ssl_cert and ssl_key and (not os.path.isfile(ssl_cert) or not os.path.isfile(ssl_key)):
+            print("SSL Certificate/Private Key not found!")
+            sys.exit(1)
         httpd.socket = ssl.wrap_socket(httpd.socket, certfile=ssl_cert, keyfile=ssl_key, server_side=True)
     # Change working dir to static resources folder
-    os.chdir("static")
+    os.chdir(f"{_APP_PATH}/static")
+    protocol = "https" if is_ssl else "http"
+    print(f"Listening on: {protocol}://{address}:{port}/")
     httpd.serve_forever()
 
-def _generate_token(username, ssl, fqdn):
+def _generate_token(username, is_ssl, fqdn):
     # TODO: Validate the username provided
 
     token = None
@@ -58,16 +65,15 @@ def _generate_token(username, ssl, fqdn):
             tokens = line.split("\t")
             if tokens[0] == username:
                 token = tokens[1]
-                break;
+                break
 
     if token is None:
         token = hashlib.sha256(username.encode() + os.urandom(32)).hexdigest()
 
-        with open("res/tokens", "a") as file:
+        with open(f"{_APP_PATH}/res/tokens", "a") as file:
             file.write(f"{username}\t{token}\n")
 
-    protocol = "https" if ssl else "http"
-    print("Token generated:\n")
+    protocol = "https" if is_ssl else "http"
     print(f"{protocol}://{fqdn}/?{token}")
 
 class SmbpasswdRequestHandler(http.server.SimpleHTTPRequestHandler):
@@ -249,7 +255,7 @@ def main():
 
         _use_sudo = _args.sudo
         _use_samba_tool = _args.samba_tool
-        _start_web_server(_args.ssl_cert, _args.ssl_key, _args.address, int(_args.port))
+        _start_web_server(_args.ssl, _args.ssl_cert, _args.ssl_key, _args.address, int(_args.port))
     elif _args.command == "gen-token":
         _generate_token(_args.username, _args.ssl, _args.fqdn)
     else:
