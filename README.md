@@ -104,8 +104,9 @@ By default ***smbpasswd-web***  will bind to localhost:8443 when in SSL mode or 
 
 PR are welcome! :)
 
-- [X] Add support for custom hostname in the generated URL. Fixed on #c925c12385.
+- [X] ~~Add support for custom hostname in the generated URL.~~ Fixed on #c925c12385.
 - [ ] Add a systemd unit file to be used as a service
+- [ ] Add an expiration date/time to the token, so unused tokens can be invalidated automatically.
 
 ## License
 
