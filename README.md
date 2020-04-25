@@ -4,7 +4,7 @@
 
 ***smbpasswd-web*** is a simple web interface to smbpasswd.
 
-The only purpose is to allow a user to change its samba password using a webbrowser, no user adding, no machine account, nothing, plain simple changing a password. By default, we use `smbpasswd`, but has been added support to use `samba-tool` instead `smbpasswd`, initial PR by @svenseeberg.
+The only purpose is to allow a user to change its samba password using a webbrowser, no user adding, no machine account, nothing, plain simple changing a password. By default, we use `smbpasswd`, but has been added support to use `samba-tool` instead `smbpasswd`, initial PR by [@svenseeberg](https://github.com/svenseeberg).
 
 ## Sneak peek
 
