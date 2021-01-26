@@ -97,7 +97,7 @@ class SmbpasswdRequestHandler(http.server.SimpleHTTPRequestHandler):
             args += ["samba-tool", "user", "setpassword", username, "--newpassword", password]
         else:
             args += ["smbpasswd", "-s", username]
-            params = (password + "\n" + password + "\n").encode()
+            input_param = (password + "\n" + password + "\n").encode()
 
         if not _use_sudo:
             args = args[1:]
