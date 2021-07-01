@@ -1,0 +1,9 @@
+[Unit]
+Description=Web Daemon for changing Samba passwords
+
+[Service]
+ExecStart=/opt/smbpasswd-web/app.py server
+WorkingDirectory=/opt/smbpasswd-web
+
+[Install]
+WantedBy=multi-user.target
