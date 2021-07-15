@@ -100,6 +100,14 @@ Send this URL to your user(See note 2 in `Usage`).
 
 By default ***smbpasswd-web***  will bind to localhost:8443 when in SSL mode or localhost:8080 otherwise. Using a `nginx`(or alike) as a proxy is good advice. Also you can expose it in port 80 or 443 so the URL gets cleaner.
 
+### Running as systemd service
+To run this server as a simple systemd service, copy the `smbpasswd-web.service` file to `/etc/systemd/system/` and modify the paths according to your needs. Then execute
+```bash
+systemctl daemon-reload
+systemctl start smbpasswd-web.service
+systemctl enable smbpasswd-web.service
+```
+
 ### TODO
 
 Migrated to issues. PRs are welcome! :)
