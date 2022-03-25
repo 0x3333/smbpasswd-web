@@ -115,3 +115,5 @@ Migrated to issues. PRs are welcome! :)
 ## License
 
  *smbpasswd-web* is released under the MIT license. See LICENSE.
+
+App icon by [icons8](https://icons8.com/).

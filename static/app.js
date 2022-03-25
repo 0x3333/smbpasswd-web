@@ -1,47 +1,6 @@
 function getUrlQuery() {
     return window.location.href.indexOf('?') > -1 ? window.location.href.slice(window.location.href.indexOf('?') + 1) : "";
 }
-function scorePassword(pass) {
-    var score = 0;
-    if (!pass)
-        return score;
-
-    // award every unique letter until 5 repetitions
-    var letters = new Object();
-    for (var i = 0; i < pass.length; i++) {
-        letters[pass[i]] = (letters[pass[i]] || 0) + 1;
-        score += 5.0 / letters[pass[i]];
-    }
-
-    // bonus points for mixing it up
-    var variations = {
-        digits: /\d/.test(pass),
-        lower: /[a-z]/.test(pass),
-        upper: /[A-Z]/.test(pass),
-        nonWords: /\W/.test(pass),
-    }
-
-    variationCount = 0;
-    for (var check in variations) {
-        variationCount += (variations[check] == true) ? 1 : 0;
-    }
-    score += (variationCount - 1) * 10;
-
-    score += pass.length < 6 ? -10 : 0;
-    return Math.max(0, parseInt(score));
-}
-
-function checkPassStrength(pass) {
-    var score = scorePassword(pass);
-    if (score > 80)
-        return "strong";
-    if (score > 60)
-        return "good";
-    if (score >= 30)
-        return "weak";
-
-    return "";
-}
 
 function populateUsername(token) {
     function fail() {
@@ -117,15 +76,19 @@ function populateUsername(token) {
     });
 
     $("#password").on("keypress keyup keydown change", function () {
-        var pass = $(this).val();
-        var score = scorePassword(pass);
-        var color, index, msg;
+        var color = "", index = 0, msg = "";
 
-        if (score <= 30) { color = "text-danger"; index = 0; msg = "Very weak"; }
-        if (score > 30 && score <= 45) { color = "text-warning"; index = 1; msg = "Weak"; }
-        if (score > 45 && score <= 60) { color = "text-info"; index = 2; msg = "Fair"; }
-        if (score > 60 && score <= 80) { color = "text-primary"; index = 3; msg = "Good"; }
-        if (score > 80) { color = "text-success"; index = 4; msg = "Strong"; }
+        var pass = $(this).val();
+        if(pass) {
+            var score = zxcvbn(pass).score;
+
+                 if (score == 0)              { color = "text-danger"; index = 0; msg = "Very weak"; }
+            else if (score > 0 && score <= 1) { color = "text-warning"; index = 1; msg = "Weak"; }
+            else if (score > 1 && score <= 2) { color = "text-info"; index = 2; msg = "Fair"; }
+            else if (score > 2 && score <= 3) { color = "text-primary"; index = 3; msg = "Good"; }
+            else if (score > 3)               { color = "text-success"; index = 4; msg = "Strong"; }
+            else                              { color = ""; index = 0; msg = ""; }
+        }
 
         $("#thermometer").attr('class', "fa fa-thermometer-" + index + " " + color);
         $("#thermometer-msg").text(msg).attr("class", "input-group-text " + color);
