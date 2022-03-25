@@ -15,6 +15,10 @@ The only purpose is to allow a user to change its samba password using a webbrow
 
 When a user needs to change his password, sysadmin will create a token, the token will generate a URL that the user will access to change its password. Done.
 
+## Password Strength
+
+We use [`zxcvbn`](https://github.com/dropbox/zxcvbn) as password strength meter.
+
 ## Securing
 
 You _MUST_ use this app over a SSL connection, otherwise, your user's password can be sniffed. You can run the embedded webserver using SSL, you just need to provide the certificate file(`--ssl-cert CERT_FILE`) and private key(`--ssl-key KEY_FILE`) with the flag `--ssl`.
